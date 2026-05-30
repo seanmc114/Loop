@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Loops</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sky: #e0f4ff;
+  --sand: #fff4d6;
+  --ocean: #2196b0;
+  --sun: #ffcc00;
+  --coral: #ff6b6b;
+  --mint: #4ecdc4;
+  --lavender: #a29bfe;
+  --text: #1a2a3a;
+  --muted: #7a8a9a;
+  --white: #ffffff;
+  --radius: 18px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+
+html { height: 100%; }
+
+body {
+  min-height: 100%;
+  background: linear-gradient(180deg, var(--sky) 0%, var(--sand) 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  padding-bottom: 200px;
+}
+
+/* ── HEADER ── */
+header {
+  text-align: center;
+  padding: 28px 20px 16px;
+}
+
+.wordmark {
+  font-family: 'Fredoka One', cursive;
+  font-size: 52px;
+  color: var(--ocean);
+  letter-spacing: 2px;
+  line-height: 1;
+  text-shadow: 3px 3px 0 rgba(33,150,176,0.15);
+}
+
+.tagline {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* ── RECORD HERO ── */
+.record-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px 20px;
+}
+
+.record-big-btn {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: none;
+  background: var(--coral);
+  box-shadow: 0 6px 0 #c0392b, 0 8px 24px rgba(255,107,107,0.4);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.record-big-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #c0392b, 0 4px 12px rgba(255,107,107,0.4); }
+
+.record-big-btn.recording {
+  background: #c0392b;
+  animation: recPulse 1s ease-in-out infinite;
+}
+
+@keyframes recPulse {
+  0%, 100% { box-shadow: 0 6px 0 #922b21, 0 8px 30px rgba(192,57,43,0.5); }
+  50% { box-shadow: 0 6px 0 #922b21, 0 8px 50px rgba(192,57,43,0.8); }
+}
+
+.rec-icon { font-size: 36px; line-height: 1; }
+.rec-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 16px;
+  color: white;
+  letter-spacing: 1px;
+}
+
+.record-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── PLAYBACK CONTROLS ── */
+.transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.transport-btn {
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 24px;
+  border: none;
+  font-family: 'Fredoka One', cursive;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: var(--shadow);
+}
+
+.transport-btn:active { transform: scale(0.95); }
+
+.btn-play { background: var(--mint); color: white; box-shadow: 0 4px 0 #2eb5ad; }
+.btn-stop { background: var(--sand); color: var(--text); border: 2px solid #ddd; box-shadow: 0 4px 0 #ddd; }
+.btn-clear { background: var(--sand); color: var(--muted); border: 2px solid #ddd; box-shadow: 0 4px 0 #ddd; font-size: 13px; }
+
+.btn-play.playing { background: #ff9f43; box-shadow: 0 4px 0 #e08020; }
+
+.bpm-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 20px 16px;
+}
+.bpm-label { font-weight: 700; font-size: 13px; color: var(--muted); }
+input[type=range] {
+  -webkit-appearance: none;
+  width: 120px;
+  height: 6px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--ocean);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(33,150,176,0.4);
+}
+.bpm-val { font-family: 'Fredoka One', cursive; color: var(--ocean); font-size: 18px; min-width: 36px; }
+
+/* ── SECTION DIVIDER ── */
+.section-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 20px;
+  color: var(--ocean);
+  padding: 8px 20px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── CATEGORY CHIPS ── */
+.categories {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.categories::-webkit-scrollbar { display: none; }
+
+.cat-chip {
+  background: white;
+  border: 2.5px solid #e0e8ef;
+  color: var(--muted);
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.cat-chip.active { background: var(--ocean); color: white; border-color: var(--ocean); }
+
+/* ── INSTRUMENT GRID ── */
+.instrument-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+@media (min-width: 480px) {
+  .instrument-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 700px) {
+  .instrument-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+.instr-btn {
+  background: white;
+  border: 2.5px solid #e0e8ef;
+  border-radius: var(--radius);
+  padding: 14px 8px 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.instr-btn:active { transform: scale(0.94); }
+.instr-btn .instr-icon { font-size: 28px; line-height: 1; }
+.instr-btn .instr-name { font-weight: 700; font-size: 11px; color: var(--text); line-height: 1.2; }
+
+/* ── ACTIVE TRACKS ── */
+.tracks-list {
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.track {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  border-left: 5px solid var(--ocean);
+  animation: trackIn 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.track.playing { border-left-color: var(--coral); }
+
+@keyframes trackIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.track-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.track-play-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--sky);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.track-play-btn.active { background: var(--coral); }
+
+.track-name-area { flex: 1; }
+.track-name { font-weight: 800; font-size: 14px; }
+.track-cat { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+.visualizer {
+  display: flex; align-items: center; gap: 3px; height: 20px;
+}
+.vis-bar {
+  width: 4px; border-radius: 2px; background: var(--ocean); opacity: 0.3;
+  height: 3px; transition: height 0.1s;
+}
+.track.playing .vis-bar { opacity: 1; }
+.track.playing .vis-bar:nth-child(1) { animation: va 0.7s ease-in-out infinite alternate; }
+.track.playing .vis-bar:nth-child(2) { animation: va 0.5s ease-in-out infinite alternate 0.1s; }
+.track.playing .vis-bar:nth-child(3) { animation: va 0.9s ease-in-out infinite alternate 0.2s; }
+.track.playing .vis-bar:nth-child(4) { animation: va 0.6s ease-in-out infinite alternate 0.05s; }
+@keyframes va { from { height: 3px; } to { height: 18px; } }
+
+.track-remove {
+  background: none; border: none; color: #ccc;
+  font-size: 22px; cursor: pointer; padding: 0 4px; line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.track-remove:active { color: var(--coral); }
+
+.track-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ctrl-label { font-size: 11px; font-weight: 700; color: var(--muted); }
+.track-vol-slider { width: 100px; }
+.loop-select {
+  background: var(--sky);
+  border: 2px solid #d0e8f0;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* ── EMPTY STATE ── */
+.tracks-empty {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+.tracks-empty .big { font-size: 40px; display: block; margin-bottom: 8px; }
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  border-top: 2px solid #e0e8ef;
+  padding: 10px 16px 12px;
+  z-index: 100;
+}
+
+.bottom-bar-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bottom-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.saved-slots {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+.saved-slots::-webkit-scrollbar { display: none; }
+
+.slot-btn {
+  background: var(--sky);
+  border: 2px solid #d0e8f0;
+  border-radius: 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 12px;
+  padding: 5px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--ocean);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-bar-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.sm-btn {
+  background: var(--sky);
+  border: 2px solid #d0e8f0;
+  border-radius: 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 12px;
+  padding: 6px 14px;
+  cursor: pointer;
+  color: var(--ocean);
+  -webkit-tap-highlight-color: transparent;
+}
+.sm-btn.save { background: var(--ocean); color: white; border-color: var(--ocean); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 500;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white;
+  border-radius: 24px 24px 24px 24px;
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 400px;
+}
+.modal h3 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 24px;
+  color: var(--ocean);
+  margin-bottom: 16px;
+}
+.modal input[type=text] {
+  width: 100%;
+  border: 2.5px solid #d0e8f0;
+  border-radius: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  outline: none;
+  color: var(--text);
+  background: var(--sky);
+}
+.modal input[type=text]:focus { border-color: var(--ocean); }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ── MIC HELP MODAL ── */
+.mic-help {
+  background: #fff8e1;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.mic-help h4 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: var(--ocean);
+}
+.mic-help p { margin-bottom: 8px; font-weight: 600; color: var(--muted); }
+.mic-help ol { padding-left: 18px; }
+.mic-help ol li { margin-bottom: 3px; font-weight: 600; }
+.mic-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.mic-tab {
+  flex: 1;
+  padding: 8px;
+  border-radius: 10px;
+  border: 2px solid #d0e8f0;
+  background: var(--sky);
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.mic-tab.active { background: var(--ocean); color: white; border-color: var(--ocean); }
+.mic-instructions { display: none; }
+.mic-instructions.show { display: block; }
+
+/* ── INLINE MIC HELP ── */
+.mic-help-inline {
+  margin-top: 16px;
+  background: #fff8e1;
+  border-radius: 16px;
+  padding: 16px;
+  max-width: 320px;
+  text-align: left;
+}
+.mic-help-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 15px;
+  color: var(--coral);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.mic-help-block {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.mic-help-block ul {
+  margin-top: 4px;
+  padding-left: 18px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.mic-help-block ul li { margin-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">🎵 Loops</div>
+  <div class="tagline">layer sounds · sing along · save it</div>
+</header>
+
+<!-- BIG RECORD BUTTON -->
+<div class="record-hero">
+  <button class="record-big-btn" id="recordBtn" onclick="toggleRecord()">
+    <span class="rec-icon" id="recIcon">🎙️</span>
+    <span class="rec-label" id="recLabel">RECORD</span>
+  </button>
+  <div class="record-hint" id="recordHint">Tap to start recording</div>
+
+  <div class="mic-help-inline" id="micHelpInline" style="display:none">
+    <div class="mic-help-title">🎙️ Microphone access is blocked</div>
+
+    <div class="mic-platform" id="mic-ios">
+      <div class="mic-help-block">
+        <strong>📱 Using Safari?</strong>
+        <ul>
+          <li>Go to <strong>Settings</strong></li>
+          <li>Scroll to <strong>Safari</strong></li>
+          <li>Tap <strong>Microphone → Allow</strong></li>
+          <li>Come back &amp; tap Record</li>
+        </ul>
+      </div>
+      <div class="mic-help-block">
+        <strong>🌐 Using Chrome?</strong>
+        <ul>
+          <li>Go to <strong>Settings</strong></li>
+          <li>Scroll to <strong>Chrome</strong></li>
+          <li>Turn <strong>Microphone on</strong></li>
+          <li>Come back &amp; tap Record</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mic-platform" id="mic-android" style="display:none">
+      <div class="mic-help-block">
+        <strong>🤖 Android</strong>
+        <ul>
+          <li>Open <strong>Settings → Apps</strong></li>
+          <li>Find your browser</li>
+          <li>Tap <strong>Permissions → Microphone → Allow</strong></li>
+          <li>Come back &amp; tap Record</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mic-platform" id="mic-desktop" style="display:none">
+      <div class="mic-help-block">
+        <strong>🖥️ Desktop</strong>
+        <ul>
+          <li>Click the 🔒 or 🎙️ icon in your address bar</li>
+          <li>Allow microphone access</li>
+          <li>Refresh and tap Record</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSPORT -->
+<div class="transport">
+  <button class="transport-btn btn-play" id="playBtn" onclick="toggleMaster()">▶ Play</button>
+  <button class="transport-btn btn-stop" onclick="stopAll()">■ Stop</button>
+  <button class="transport-btn btn-clear" onclick="clearTracks()">🗑 Clear</button>
+</div>
+
+<div class="bpm-row">
+  <span class="bpm-label">Speed</span>
+  <input type="range" min="20" max="120" value="60" id="bpmSlider" oninput="setBPM(this.value)">
+  <span class="bpm-val" id="bpmVal">60</span>
+</div>
+
+<!-- SOUND PICKER -->
+<div class="section-title">🎹 Pick sounds</div>
+<div class="categories" id="categoryTabs"></div>
+<div class="instrument-grid" id="instrumentGrid"></div>
+
+<!-- ACTIVE LOOPS -->
+<div class="section-title">🔁 Your loops</div>
+<div class="tracks-list" id="tracksContainer">
+  <div class="tracks-empty"><span class="big">👆</span>Tap a sound above to add it</div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bottom-bar-top">
+    <span class="bottom-label">Saved</span>
+    <div class="saved-slots" id="savedSlots"><span style="color:#aaa;font-size:12px">None yet</span></div>
+  </div>
+  <div class="bottom-bar-actions">
+    <label class="sm-btn" style="cursor:pointer">Import <input type="file" accept=".json" style="display:none" onchange="importJSON(event)"></label>
+    <button class="sm-btn" onclick="exportJSON()">Export</button>
+    <button class="sm-btn save" onclick="openSave()">💾 Save</button>
+  </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div class="modal-overlay" id="saveModal">
+  <div class="modal">
+    <h3>💾 Save your loop</h3>
+    <input type="text" id="saveName" placeholder="Give it a name..." maxlength="40">
+    <div class="modal-btns">
+      <button class="sm-btn" onclick="closeSave()">Cancel</button>
+      <button class="sm-btn save" onclick="confirmSave()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MIC HELP MODAL -->
+<div class="modal-overlay" id="micModal">
+  <div class="modal">
+    <h3>🎙️ Allow microphone</h3>
+    <div class="mic-tabs">
+      <button class="mic-tab active" onclick="showMicTab('safari')">📱 Safari</button>
+      <button class="mic-tab" onclick="showMicTab('chrome')">🌐 Chrome</button>
+      <button class="mic-tab" onclick="showMicTab('android')">🤖 Android</button>
+    </div>
+
+    <div class="mic-help">
+      <div class="mic-instructions show" id="mic-safari">
+        <h4>Safari on iPhone</h4>
+        <ol>
+          <li>Open <strong>Settings</strong> on your phone</li>
+          <li>Scroll down to <strong>Safari</strong></li>
+          <li>Tap <strong>Microphone</strong> → set to <strong>Allow</strong></li>
+          <li>Come back here and tap Record again</li>
+        </ol>
+      </div>
+      <div class="mic-instructions" id="mic-chrome">
+        <h4>Chrome on iPhone</h4>
+        <ol>
+          <li>Open <strong>Settings</strong> on your phone</li>
+          <li>Scroll down to <strong>Chrome</strong></li>
+          <li>Tap <strong>Microphone</strong> → turn it <strong>On</strong></li>
+          <li>Come back here and tap Record again</li>
+        </ol>
+      </div>
+      <div class="mic-instructions" id="mic-android">
+        <h4>Android</h4>
+        <ol>
+          <li>Open <strong>Settings</strong></li>
+          <li>Tap <strong>Apps</strong> → find your browser</li>
+          <li>Tap <strong>Permissions → Microphone → Allow</strong></li>
+          <li>Come back here and tap Record again</li>
+        </ol>
+        <p style="margin-top:8px">Or tap the 🔒 icon in your browser address bar and allow microphone there.</p>
+      </div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="sm-btn save" onclick="closeMicModal()">Got it!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── INSTRUMENTS ──────────────────────────────────────────────────────────────
+const INSTRUMENTS = [
+  { id:'violin',     name:'Violin',       cat:'Strings', icon:'🎻', synth:'violin' },
+  { id:'cello',      name:'Cello',        cat:'Strings', icon:'🎻', synth:'cello' },
+  { id:'strings',    name:'Strings',      cat:'Strings', icon:'〰️', synth:'stringPad' },
+  { id:'piano',      name:'Piano',        cat:'Keys',    icon:'🎹', synth:'piano' },
+  { id:'musicbox',   name:'Music Box',    cat:'Keys',    icon:'🎵', synth:'musicbox' },
+  { id:'celesta',    name:'Celesta',      cat:'Keys',    icon:'✨', synth:'celesta' },
+  { id:'choirAah',   name:'Choir Aah',    cat:'Choir',   icon:'🎤', synth:'choirAah' },
+  { id:'choirOoh',   name:'Choir Ooh',    cat:'Choir',   icon:'🎤', synth:'choirOoh' },
+  { id:'flute',      name:'Flute',        cat:'Wind',    icon:'🪈', synth:'flute' },
+  { id:'clarinet',   name:'Clarinet',     cat:'Wind',    icon:'🎷', synth:'clarinet' },
+  { id:'horn',       name:'French Horn',  cat:'Brass',   icon:'📯', synth:'horn' },
+  { id:'trumpet',    name:'Trumpet',      cat:'Brass',   icon:'🎺', synth:'trumpet' },
+  { id:'glock',      name:'Glockenspiel', cat:'Bells',   icon:'🔔', synth:'glock' },
+  { id:'marimba',    name:'Marimba',      cat:'Bells',   icon:'🥁', synth:'marimba' },
+  { id:'vibraphone', name:'Vibraphone',   cat:'Bells',   icon:'✨', synth:'vibraphone' },
+  { id:'acousticGtr',name:'Guitar',       cat:'Guitar',  icon:'🎸', synth:'acousticGtr' },
+  { id:'padWarm',    name:'Warm Pad',     cat:'Synth',   icon:'🌫️', synth:'warmPad' },
+  { id:'padAngel',   name:'Angel Pad',    cat:'Synth',   icon:'☁️', synth:'angelPad' },
+  { id:'drone',      name:'Drone',        cat:'Synth',   icon:'〰️', synth:'drone' },
+  { id:'rain',       name:'Rain',         cat:'Nature',  icon:'🌧️', synth:'rain' },
+  { id:'waves',      name:'Waves',        cat:'Nature',  icon:'🌊', synth:'waves' },
+  { id:'wind',       name:'Wind',         cat:'Nature',  icon:'💨', synth:'wind' },
+  { id:'forest',     name:'Forest',       cat:'Nature',  icon:'🌲', synth:'forest' },
+  { id:'bowl',       name:'Singing Bowl', cat:'Nature',  icon:'🪬', synth:'bowl' },
+];
+
+const CATEGORIES = ['All', ...new Set(INSTRUMENTS.map(i => i.cat))];
+const LOOP_LENGTHS = ['1m','2m','4m','8m'];
+const SCALES = { pentatonic: ['C4','D4','E4','G4','A4','C5','D5','E5'] };
+
+let tracks = [], masterPlaying = false, bpm = 60, trackIdCounter = 0, activeCat = 'All';
+Tone.getTransport().bpm.value = 60;
+
+// ── SYNTH FACTORY ────────────────────────────────────────────────────────────
+function makeSynth(type) {
+  const vol = new Tone.Volume(-10).toDestination();
+  const melodic = (opts) => {
+    const s = new Tone.PolySynth(Tone.Synth, opts);
+    const rev = new Tone.Reverb({ decay: 4, wet: 0.5 }).connect(vol);
+    s.connect(rev);
+    return { synth: s, vol, isNoise: false, dispose: () => { s.dispose(); rev.dispose(); vol.dispose(); } };
+  };
+  const padSynth = (opts) => {
+    const s = new Tone.PolySynth(Tone.Synth, { oscillator:{type:'sine'}, envelope:{attack:2,decay:1,sustain:0.8,release:4}, ...opts });
+    const rev = new Tone.Reverb({ decay: 6, wet: 0.7 }).connect(vol);
+    const cho = new Tone.Chorus(0.5, 2.5, 0.5).connect(rev);
+    s.connect(cho);
+    return { synth: s, vol, isNoise: false, dispose: () => { s.dispose(); rev.dispose(); cho.dispose(); vol.dispose(); } };
+  };
+  const noise = (color='white', freq=800) => {
+    const n = new Tone.Noise(color);
+    const f = new Tone.Filter(freq, 'lowpass');
+    const env = new Tone.AmplitudeEnvelope({ attack:1, decay:0.5, sustain:0.8, release:2 });
+    const rev = new Tone.Reverb({ decay:5, wet:0.6 });
+    n.connect(f); f.connect(env); env.connect(rev); rev.connect(vol);
+    return { synth: n, vol, isNoise: true, dispose: () => { n.dispose(); f.dispose(); env.dispose(); rev.dispose(); vol.dispose(); } };
+  };
+  switch(type) {
+    case 'piano':      return melodic({ oscillator:{type:'triangle'}, envelope:{attack:0.02,decay:1.5,sustain:0.3,release:1.5} });
+    case 'musicbox':   return melodic({ oscillator:{type:'sine'}, envelope:{attack:0.01,decay:1.2,sustain:0.1,release:0.8} });
+    case 'celesta':    return melodic({ oscillator:{type:'sine'}, envelope:{attack:0.01,decay:0.8,sustain:0.05,release:0.5} });
+    case 'violin':     return melodic({ oscillator:{type:'sawtooth'}, envelope:{attack:0.5,decay:0.2,sustain:0.8,release:0.5} });
+    case 'cello':      return melodic({ oscillator:{type:'sawtooth'}, envelope:{attack:0.8,decay:0.2,sustain:0.9,release:1} });
+    case 'stringPad':  return padSynth({ oscillator:{type:'sawtooth'} });
+    case 'flute':      return melodic({ oscillator:{type:'sine'}, envelope:{attack:0.2,decay:0.1,sustain:0.9,release:0.4} });
+    case 'clarinet':   return melodic({ oscillator:{type:'square'}, envelope:{attack:0.15,decay:0.1,sustain:0.85,release:0.4} });
+    case 'horn':
+    case 'trumpet':    return melodic({ oscillator:{type:'sawtooth'}, envelope:{attack:0.3,decay:0.1,sustain:0.7,release:0.5} });
+    case 'choirAah':
+    case 'choirOoh':   return padSynth({ envelope:{attack:2.5,decay:0.5,sustain:0.9,release:3} });
+    case 'glock':
+    case 'xylophone':  return melodic({ oscillator:{type:'sine'}, envelope:{attack:0.01,decay:0.6,sustain:0.05,release:0.3} });
+    case 'marimba':    return melodic({ oscillator:{type:'triangle'}, envelope:{attack:0.01,decay:0.8,sustain:0.1,release:0.5} });
+    case 'vibraphone': return melodic({ oscillator:{type:'sine'}, envelope:{attack:0.02,decay:1.5,sustain:0.4,release:1} });
+    case 'acousticGtr':return melodic({ oscillator:{type:'triangle'}, envelope:{attack:0.01,decay:1,sustain:0.2,release:1} });
+    case 'warmPad':    return padSynth({ oscillator:{type:'sine'} });
+    case 'angelPad':   return padSynth({ oscillator:{type:'sine4'}, envelope:{attack:2,decay:0.5,sustain:0.9,release:4} });
+    case 'drone':      return padSynth({ oscillator:{type:'sawtooth4'}, envelope:{attack:4,decay:0,sustain:1,release:6} });
+    case 'bowl':       return melodic({ oscillator:{type:'sine'}, envelope:{attack:0.01,decay:4,sustain:0.1,release:3} });
+    case 'rain':       return noise('white', 1200);
+    case 'waves':      return noise('pink', 400);
+    case 'wind':       return noise('white', 600);
+    case 'forest':     return noise('brown', 300);
+    default:           return melodic({ oscillator:{type:'sine'}, envelope:{attack:1,decay:0,sustain:1,release:2} });
+  }
+}
+
+// ── PATTERN ──────────────────────────────────────────────────────────────────
+function generatePattern(synthType, barCount) {
+  const notes = SCALES.pentatonic;
+  const isAmbient = ['rain','waves','wind','forest','fire'].includes(synthType);
+  const isDrone = ['drone','angelPad','warmPad','choirAah','choirOoh','stringPad'].includes(synthType);
+  if (isAmbient) return null;
+  if (isDrone) return [{ time:'0:0:0', note:[notes[0],notes[2],notes[4]].filter(Boolean), dur:`${barCount}m` }];
+  const events = [];
+  for (let i = 0; i < barCount * 4; i++) {
+    if (Math.random() < 0.35) {
+      events.push({ time:`${Math.floor(i/4)}:${i%4}:0`, note:notes[(i*3)%notes.length], dur:'4n' });
+    }
+  }
+  if (!events.length) events.push({ time:'0:0:0', note:notes[0], dur:'2n' });
+  return events;
+}
+
+// ── TRACK ─────────────────────────────────────────────────────────────────────
+function addTrack(instrDef) {
+  const id = ++trackIdCounter;
+  const { synth, vol, isNoise, dispose } = makeSynth(instrDef.synth);
+  vol.volume.value = -10;
+  tracks.push({ id, instrDef, synth, vol, isNoise, dispose, loopLen:'4m', playing:false, volume:80, toneLoop:null, pattern:generatePattern(instrDef.synth,4) });
+  renderTracks();
+}
+
+function startTrackLoop(track) {
+  if (track.toneLoop) { try { track.toneLoop.dispose(); } catch(e){} track.toneLoop = null; }
+  if (track.isNoise) { track.synth.start(); track.playing = true; return; }
+  if (!track.pattern) return;
+  const part = new Tone.Part((time, ev) => {
+    track.synth.triggerAttackRelease(ev.note, ev.dur, time);
+  }, track.pattern);
+  part.loop = true; part.loopEnd = track.loopLen; part.start(0);
+  track.toneLoop = part; track.playing = true;
+}
+
+function stopTrackLoop(track) {
+  if (track.isNoise) { try { track.synth.stop(); } catch(e){} }
+  if (track.toneLoop) { try { track.toneLoop.stop(); track.toneLoop.dispose(); } catch(e){} track.toneLoop = null; }
+  track.playing = false;
+}
+
+async function toggleMaster() {
+  await Tone.start();
+  masterPlaying = !masterPlaying;
+  const btn = document.getElementById('playBtn');
+  if (masterPlaying) {
+    Tone.getTransport().start();
+    tracks.forEach(t => { if (!t.playing) startTrackLoop(t); });
+    btn.textContent = '⏸ Pause';
+    btn.classList.add('playing');
+  } else {
+    tracks.forEach(t => stopTrackLoop(t));
+    Tone.getTransport().stop();
+    btn.textContent = '▶ Play';
+    btn.classList.remove('playing');
+  }
+  renderTracks();
+}
+
+function stopAll() {
+  masterPlaying = false;
+  tracks.forEach(t => stopTrackLoop(t));
+  Tone.getTransport().stop();
+  const btn = document.getElementById('playBtn');
+  btn.textContent = '▶ Play'; btn.classList.remove('playing');
+  renderTracks();
+}
+
+async function toggleTrack(id) {
+  await Tone.start();
+  const track = tracks.find(t => t.id === id);
+  if (!track) return;
+  if (track.playing) { stopTrackLoop(track); }
+  else { if (Tone.getTransport().state !== 'started') Tone.getTransport().start(); startTrackLoop(track); }
+  renderTracks();
+}
+
+function setTrackVolume(id, val) {
+  const t = tracks.find(t => t.id === id);
+  if (!t) return;
+  t.volume = val;
+  t.vol.volume.value = Tone.gainToDb(val/100);
+}
+
+function setTrackLoopLen(id, val) {
+  const t = tracks.find(t => t.id === id);
+  if (!t) return;
+  const was = t.playing;
+  if (was) stopTrackLoop(t);
+  t.loopLen = val; t.pattern = generatePattern(t.instrDef.synth, parseInt(val));
+  if (was) startTrackLoop(t);
+}
+
+function removeTrack(id) {
+  const idx = tracks.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  stopTrackLoop(tracks[idx]); tracks[idx].dispose(); tracks.splice(idx,1); renderTracks();
+}
+
+function clearTracks() { stopAll(); tracks.forEach(t => t.dispose()); tracks = []; renderTracks(); }
+function setBPM(v) { bpm = v; Tone.getTransport().bpm.value = v; document.getElementById('bpmVal').textContent = v; }
+
+// ── RECORDER ─────────────────────────────────────────────────────────────────
+let myRecorder = null, recordedChunks = [];
+
+async function toggleRecord() {
+  if (myRecorder && myRecorder.state === 'recording') {
+    stopRecording();
+  } else {
+    await startRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    // Exact Lullaby pattern — bare getUserMedia, nothing before it
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    await Tone.start();
+    if (!masterPlaying) await toggleMaster();
+
+    recordedChunks = [];
+    myRecorder = new MediaRecorder(stream);
+    myRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    myRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); finishRecording(); };
+    myRecorder.start();
+
+    document.getElementById('recordBtn').classList.add('recording');
+    document.getElementById('recIcon').textContent = '⏹️';
+    document.getElementById('recLabel').textContent = 'STOP';
+    document.getElementById('recordHint').textContent = 'Recording… tap to stop & save';
+    document.getElementById('micHelpInline').style.display = 'none';
+  } catch(e) {
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const android = /Android/.test(navigator.userAgent);
+    document.getElementById('micHelpInline').style.display = 'block';
+    document.getElementById('mic-ios').style.display = ios ? 'block' : 'none';
+    document.getElementById('mic-android').style.display = (android && !ios) ? 'block' : 'none';
+    document.getElementById('mic-desktop').style.display = (!ios && !android) ? 'block' : 'none';
+    document.getElementById('recordHint').textContent = 'Mic access needed — see below';
+    console.error(e);
+  }
+}
+
+function stopRecording() {
+  if (myRecorder && myRecorder.state === 'recording') myRecorder.stop();
+  document.getElementById('recordBtn').classList.remove('recording');
+  document.getElementById('recIcon').textContent = '🎙️';
+  document.getElementById('recLabel').textContent = 'RECORD';
+  document.getElementById('recordHint').textContent = 'Tap to start recording';
+}
+
+function finishRecording() {
+  const mimeType = recordedChunks[0]?.type || 'audio/webm';
+  const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
+  const blob = new Blob(recordedChunks, { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `loops-${Date.now()}.${ext}`; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  recordedChunks = [];
+  document.getElementById('recordHint').textContent = '✅ Saved to your device!';
+  setTimeout(() => document.getElementById('recordHint').textContent = 'Tap to start recording', 3000);
+}
+
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderCategories() {
+  document.getElementById('categoryTabs').innerHTML = CATEGORIES.map(c =>
+    `<button class="cat-chip${c===activeCat?' active':''}" onclick="setCategory('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setCategory(cat) { activeCat = cat; renderCategories(); renderInstruments(); }
+
+function renderInstruments() {
+  const list = activeCat === 'All' ? INSTRUMENTS : INSTRUMENTS.filter(i => i.cat === activeCat);
+  document.getElementById('instrumentGrid').innerHTML = list.map(i =>
+    `<button class="instr-btn" onclick="addTrack(INSTRUMENTS.find(x=>x.id==='${i.id}'))">
+      <span class="instr-icon">${i.icon}</span>
+      <span class="instr-name">${i.name}</span>
+    </button>`
+  ).join('');
+}
+
+function renderTracks() {
+  const c = document.getElementById('tracksContainer');
+  if (!tracks.length) {
+    c.innerHTML = `<div class="tracks-empty"><span class="big">👆</span>Tap a sound above to add it</div>`;
+    return;
+  }
+  c.innerHTML = tracks.map(t => `
+    <div class="track${t.playing?' playing':''}">
+      <div class="track-top">
+        <button class="track-play-btn${t.playing?' active':''}" onclick="toggleTrack(${t.id})">
+          ${t.playing ? '⏸' : '▶'}
+        </button>
+        <div class="track-name-area">
+          <div class="track-name">${t.instrDef.icon} ${t.instrDef.name}</div>
+          <div class="track-cat">${t.instrDef.cat}</div>
+        </div>
+        <div class="visualizer">
+          <div class="vis-bar"></div><div class="vis-bar"></div>
+          <div class="vis-bar"></div><div class="vis-bar"></div>
+        </div>
+        <button class="track-remove" onclick="removeTrack(${t.id})">×</button>
+      </div>
+      <div class="track-controls">
+        <span class="ctrl-label">Vol</span>
+        <input type="range" class="track-vol-slider" min="0" max="100" value="${t.volume}" oninput="setTrackVolume(${t.id},this.value)">
+        <span class="ctrl-label">Loop</span>
+        <select class="loop-select" onchange="setTrackLoopLen(${t.id},this.value)">
+          ${LOOP_LENGTHS.map(l => `<option value="${l}"${l===t.loopLen?' selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── SAVE/LOAD ─────────────────────────────────────────────────────────────────
+function openSave() { document.getElementById('saveModal').classList.add('open'); document.getElementById('saveName').focus(); }
+function closeSave() { document.getElementById('saveModal').classList.remove('open'); }
+
+function confirmSave() {
+  const name = document.getElementById('saveName').value.trim() || 'My Loop';
+  const saves = JSON.parse(localStorage.getItem('loops_saves') || '[]');
+  saves.unshift({ name, bpm, tracks: tracks.map(t => ({ instrId:t.instrDef.id, loopLen:t.loopLen, volume:t.volume })), savedAt:Date.now() });
+  if (saves.length > 12) saves.pop();
+  localStorage.setItem('loops_saves', JSON.stringify(saves));
+  closeSave(); document.getElementById('saveName').value = '';
+  renderSavedSlots();
+}
+
+function loadSave(idx) {
+  const saves = JSON.parse(localStorage.getItem('loops_saves') || '[]');
+  const data = saves[idx]; if (!data) return;
+  stopAll(); tracks.forEach(t => t.dispose()); tracks = [];
+  setBPM(data.bpm || 60); document.getElementById('bpmSlider').value = data.bpm || 60;
+  (data.tracks || []).forEach(td => {
+    const instrDef = INSTRUMENTS.find(i => i.id === td.instrId); if (!instrDef) return;
+    const { synth, vol, isNoise, dispose } = makeSynth(instrDef.synth);
+    vol.volume.value = Tone.gainToDb((td.volume||80)/100);
+    tracks.push({ id:++trackIdCounter, instrDef, synth, vol, isNoise, dispose, loopLen:td.loopLen||'4m', playing:false, volume:td.volume||80, toneLoop:null, pattern:generatePattern(instrDef.synth,parseInt(td.loopLen||'4')) });
+  });
+  renderTracks();
+}
+
+function renderSavedSlots() {
+  const saves = JSON.parse(localStorage.getItem('loops_saves') || '[]');
+  const el = document.getElementById('savedSlots');
+  el.innerHTML = saves.length
+    ? saves.map((s,i) => `<button class="slot-btn" onclick="loadSave(${i})">${s.name}</button>`).join('')
+    : '<span style="color:#aaa;font-size:12px">None yet</span>';
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify({ bpm, tracks: tracks.map(t => ({ instrId:t.instrDef.id, loopLen:t.loopLen, volume:t.volume })) }, null, 2)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'loops.json'; a.click();
+}
+
+function importJSON(ev) {
+  const file = ev.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      stopAll(); tracks.forEach(t => t.dispose()); tracks = [];
+      if (data.bpm) { setBPM(data.bpm); document.getElementById('bpmSlider').value = data.bpm; }
+      (data.tracks||[]).forEach(td => {
+        const instrDef = INSTRUMENTS.find(i => i.id === td.instrId); if (!instrDef) return;
+        const { synth, vol, isNoise, dispose } = makeSynth(instrDef.synth);
+        vol.volume.value = Tone.gainToDb((td.volume||80)/100);
+        tracks.push({ id:++trackIdCounter, instrDef, synth, vol, isNoise, dispose, loopLen:td.loopLen||'4m', playing:false, volume:td.volume||80, toneLoop:null, pattern:generatePattern(instrDef.synth,parseInt(td.loopLen||'4')) });
+      });
+      renderTracks();
+    } catch(e) {}
+  };
+  reader.readAsText(file); ev.target.value = '';
+}
+
+function showMicModal() {
+  document.getElementById('micModal').classList.add('open');
+  // Auto-detect likely browser
+  const ua = navigator.userAgent;
+  if (/CriOS/.test(ua)) showMicTab('chrome');
+  else if (/Android/.test(ua)) showMicTab('android');
+  else showMicTab('safari');
+}
+function closeMicModal() { document.getElementById('micModal').classList.remove('open'); }
+function showMicTab(tab) {
+  ['safari','chrome','android'].forEach(t => {
+    document.getElementById('mic-'+t).classList.toggle('show', t===tab);
+  });
+  document.querySelectorAll('.mic-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', ['safari','chrome','android'][i] === tab);
+  });
+}
+document.getElementById('micModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeMicModal(); });
+
+
+document.getElementById('saveName').addEventListener('keydown', e => { if (e.key==='Enter') confirmSave(); if (e.key==='Escape') closeSave(); });
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderCategories();
+renderInstruments();
+renderSavedSlots();
+</script>
+</body>
+</html>
